@@ -1,5 +1,5 @@
 ---
-- hosts: testservers
+- hosts: "Cluster Group 30"
   serial: 1
   gather_facts: no
   vars:
