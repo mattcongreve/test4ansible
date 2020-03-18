@@ -1,0 +1,7 @@
+- module: windows
+  metricsets:
+  - service
+  period: 1m
+  processors:
+  - drop_event.when.not.regexp:
+      windows.service.display_name: {{ coyote_service_regexp }}

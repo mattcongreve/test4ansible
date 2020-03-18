@@ -1,0 +1,31 @@
+---
+- hosts: testservers
+  serial: 1
+  gather_facts: no
+  vars:
+    logstash_host: logstash-test.coyote.com
+    coyote_service_regexp: Coyote*
+  tasks:
+  - name: Ensuring Metricbeat is installed
+    win_chocolatey:
+      name: metricbeat
+      version: 6.7.0
+  - name: Configuring Metricbeat
+    win_template:
+      src: metricbeat.yml.j2
+      dest: C:\\ProgramData\\chocolatey\\lib\\metricbeat\\tools\\metricbeat.yml
+    register: metricbeat_result
+  - name: Configuring Metricbeat Windows module
+    win_template:
+      src: windows.yml.j2
+      dest: C:\\ProgramData\\chocolatey\\lib\\metricbeat\\tools\\modules.d\\windows.yml
+    register: windows_result
+  - name: Ensuring Metricbeat Windows module is running
+    win_service:
+      name: metricbeat
+      state: started
+  - name: Restarting Metricbeat service if configuration changed
+    when: metricbeat_result.changed or windows_result.changed
+    win_service:
+      name: metricbeat
+      state: restarted
